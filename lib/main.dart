@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinlist_app/core/security/sinlist_systems_auth.dart';
 import 'package:sinlist_app/pages/home_page.dart';
 import 'package:sinlist_app/pages/routes_page.dart';
+import 'package:sinlist_app/pages/splash_page.dart';
 import 'bloc/bloc_providers.dart';
 import 'core/http/api_provider.dart';
 import 'package:sinlist_app/theme.dart' as educationSystemsTheme;
@@ -85,7 +86,7 @@ class Sinlist extends StatelessWidget {
         brightness: Brightness.dark,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      home: SplashScreen(),
       routes: Routes.get(),
     );
   }
