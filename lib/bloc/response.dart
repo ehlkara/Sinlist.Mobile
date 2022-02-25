@@ -1,8 +1,9 @@
 abstract class ResponseBase<T> {
+  final int statusCode;
   final T result;
   final ResponseError error;
   final bool hasError;
-  ResponseBase(this.result, this.error, this.hasError);
+  ResponseBase(this.result, this.error, this.hasError, this.statusCode);
 }
 
 class ResponseError {
@@ -13,11 +14,12 @@ class ResponseError {
 }
 
 class Response<T> implements ResponseBase<T> {
-  Response(this.result, this.error, this.hasError);
+  Response(this.result, this.error, this.hasError, this.statusCode);
 
   Response.fromJson(Map<String, dynamic> json)
       : result = json["result"],
         error = json["result"],
+        statusCode = json["statusCode"],
         hasError = json["hasError"];
 
   @override
@@ -31,4 +33,8 @@ class Response<T> implements ResponseBase<T> {
   @override
   // TODO: implement result
   final T result;
+
+  @override
+  // TODO: implement result
+  final int statusCode;
 }
