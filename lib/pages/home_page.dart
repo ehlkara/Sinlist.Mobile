@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sinlist_app/core/bloc/result_state.dart';
 import 'package:sinlist_app/core/http/network_exceptions.dart';
 import 'package:sinlist_app/data/lists/todolist.dart';
+import 'package:sinlist_app/pages/constants.dart';
+import 'package:sinlist_app/theme.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
@@ -27,6 +29,20 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Text('Sinlist', style: TextStyle(
+              fontFamily: 'Helvetica Neue',
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: kPrimaryColor,
+            ),),
+            Image.asset('assets/images/cookie-bite-solid.png'),
+          ],
+        ),
+      ),
       body: BlocBuilder<HomeBloc, ResultState<List<Todolist>>>(
         builder: (BuildContext context, ResultState<List<Todolist>> state) {
           return state.when(
