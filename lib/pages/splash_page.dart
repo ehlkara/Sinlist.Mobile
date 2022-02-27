@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: Text(
                   'Sinlist',
                   style: TextStyle(
-                    fontFamily: 'OpenSans-Regular',
+                    fontFamily: 'Ubuntu',
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
