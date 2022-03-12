@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,10 +8,12 @@ import 'package:sinlist_app/data/lists/todolist.dart';
 import 'package:sinlist_app/data/lists/todolist_items.dart';
 import 'package:sinlist_app/pages/constants.dart';
 import 'package:sinlist_app/pages/widgets/general_button.dart';
+import 'package:sinlist_app/pages/widgets/general_input_field.dart';
 import 'package:sinlist_app/pages/widgets/toaster.dart';
 
 class ListItems extends StatefulWidget {
-  const ListItems({Key key, this.todolist, this.todolistItems}) : super(key: key);
+  const ListItems({Key key, this.todolist, this.todolistItems})
+      : super(key: key);
   final String routeName = "/list_items";
 
   final Todolist todolist;
@@ -24,16 +24,46 @@ class ListItems extends StatefulWidget {
 }
 
 class _ListItemsState extends State<ListItems> {
+  GlobalKey<FormState> todoItemCreateFormKey = new GlobalKey<FormState>();
+  TodoListItems _createListItem = new TodoListItems();
+
+  bool validateAndSave() {
+    final form = todoItemCreateFormKey.currentState;
+    if (form.validate()) {
+      form.save();
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> _addTodolistItem(BuildContext buildContext,TodoListItems _todoListItem) async {
+    if (validateAndSave()) {
+      _todoListItem.todoListId = widget.todolist.id;
+      _todoListItem.id = 0;
+      var result = await buildContext
+          .read<HomeBloc>()
+          .repository
+          .addTodolistItem(_todoListItem);
+      result.when(success: (TodoListItems response) {
+        if (response != null) {
+          setState(() {
+            _todoListItem = response;
+          });
+        }
+      }, failure: (NetworkExceptions error) {
+        Toaster.error(context: buildContext, error: error);
+      });
+    }
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
 
   @override
   void didChangeDependencies() {
-
     super.didChangeDependencies();
   }
 
   @override
   void initState() {
-
     super.initState();
   }
 
@@ -54,7 +84,7 @@ class _ListItemsState extends State<ListItems> {
           color: kSecondaryColor,
         ),
         child: Container(
-          margin: EdgeInsets.only(bottom: 20,top: 20,right: 20,left: 20),
+          margin: EdgeInsets.only(bottom: 20, top: 20, right: 20, left: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -95,7 +125,31 @@ class _ListItemsState extends State<ListItems> {
                       text: "Add Item",
                       key: Key("AddItemButton"),
                       textColor: Colors.white,
-                      press: null,
+                      press: () => showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          title: const Text('AlertDialog Title'),
+                          content: StatefulBuilder(
+                            builder:
+                                (BuildContext context, StateSetter _setState) {
+                              return _addListItemPopUpContent(
+                                  context, _setState);
+                            },
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, 'Cancel'),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                _addTodolistItem(context, _createListItem);
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -120,7 +174,10 @@ class _ListItemsState extends State<ListItems> {
   _itemContainer(BuildContext buildContext, TodoListItems item, int index) {
     return Container(
       margin: EdgeInsets.only(left: 10, right: 10, bottom: 17),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15),color: Colors.white,),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+      ),
       child: Row(
         children: [
           Checkbox(value: false, onChanged: null),
@@ -178,6 +235,42 @@ class _ListItemsState extends State<ListItems> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  _addListItemPopUpContent(BuildContext buildContext, StateSetter _setState) {
+    return SingleChildScrollView(
+      child: new Form(
+        key: todoItemCreateFormKey,
+        child: Column(
+          children: [
+            GeneralInputField(
+              key: Key("listItemName"),
+              hintText: "Item Name",
+              validator: (val) =>
+              val.isEmpty ? 'Item name is required' : null,
+              onSaved: (val) => _createListItem.name = val,
+            ),
+            SizedBox(height: 5),
+            GeneralInputField(
+              key: Key("listItemDescription"),
+              hintText: "Item Description",
+              validator: (val) =>
+              val.isEmpty ? 'Item Description is required' : null,
+              onSaved: (val) => _createListItem.description = val,
+            ),
+            SizedBox(height: 5),
+            GeneralInputField(
+              key: Key("listItemCount"),
+              hintText: "Item Count",
+              inputType: TextInputType.number,
+              validator: (val) =>
+              val.isEmpty ? 'Item Count is required' : null,
+              onSaved: (val) => val != "" ?  _createListItem.count = int.parse(val) : _createListItem.count = 0,
+            ),
+          ],
+        ),
       ),
     );
   }

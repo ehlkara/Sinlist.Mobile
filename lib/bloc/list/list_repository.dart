@@ -49,7 +49,7 @@ class ListRepository implements BaseRepository {
 
   Future<ApiResult<bool>> deleteTodolistItem(int todolistItemId) async {
     try {
-      final json = await apiProvider.get(
+      final json = await apiProvider.delete(
           "Todos/delete_todolist_item?todoListItemId=$todolistItemId");
       ApiResponse apiResponse = ApiResponse.fromJson(json);
       if (!apiResponse.hasError) {
@@ -64,8 +64,8 @@ class ListRepository implements BaseRepository {
 
   Future<ApiResult<TodoListItems>> updateTodolistItem(TodoListItems todoListItem) async {
     try {
-      final json = await apiProvider.get(
-          "Todos/update_todolist_item");
+      final json = await apiProvider.post(
+          "Todos/update_todolist_item", data: todoListItem.toJson());
       ApiResponse apiResponse = ApiResponse.fromJson(json);
       if (!apiResponse.hasError) {
         var response = TodoListItems.fromJson(apiResponse.result);
@@ -80,8 +80,8 @@ class ListRepository implements BaseRepository {
 
   Future<ApiResult<TodoListItems>> addTodolistItem(TodoListItems todoListItem) async {
     try {
-      final json = await apiProvider.get(
-          "Todos/add_todolist_item");
+      final json = await apiProvider.post(
+          "Todos/add_todolist_item", data: todoListItem.toJson());
       ApiResponse apiResponse = ApiResponse.fromJson(json);
       if (!apiResponse.hasError) {
         var response = TodoListItems.fromJson(apiResponse.result);
@@ -112,7 +112,7 @@ class ListRepository implements BaseRepository {
 
   Future<ApiResult<bool>> deleteTodolist(int todolistId) async {
     try {
-      final json = await apiProvider.get(
+      final json = await apiProvider.delete(
           "Todos/delete_todolist?todoListId=$todolistId");
       ApiResponse apiResponse = ApiResponse.fromJson(json);
       if (!apiResponse.hasError) {
@@ -127,8 +127,8 @@ class ListRepository implements BaseRepository {
 
   Future<ApiResult<bool>> updateTodolist(Todolist todolist) async {
     try {
-      final json = await apiProvider.get(
-          "Todos/update");
+      final json = await apiProvider.post(
+          "Todos/update", data: todolist.toJson());
       ApiResponse apiResponse = ApiResponse.fromJson(json);
       if (!apiResponse.hasError) {
         return ApiResult.success(data: true);
@@ -141,8 +141,8 @@ class ListRepository implements BaseRepository {
   }
   Future<ApiResult<Todolist>> addTodolist(Todolist todolist) async {
     try {
-      final json = await apiProvider.get(
-          "Todos/add");
+      final json = await apiProvider.post(
+          "Todos/add", data: todolist.toJson());
       ApiResponse apiResponse = ApiResponse.fromJson(json);
       if (!apiResponse.hasError) {
         var response = Todolist.fromJson(apiResponse.result);
