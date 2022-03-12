@@ -54,17 +54,18 @@ class _ListItemsState extends State<ListItems> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    if (widget.todolist == null) {
+    if (widget.todolist.id == null) {
       return Center();
     } else {
       return Container(
-        color: kSecondaryColor,
         width: size.width,
+        height: size.height,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(15),
             topRight: Radius.circular(15),
           ),
+          color: kSecondaryColor,
         ),
         child: Column(
           children: [
