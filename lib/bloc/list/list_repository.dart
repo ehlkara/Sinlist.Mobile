@@ -21,6 +21,7 @@ class ListRepository implements BaseRepository {
       ApiResponse apiResponse = ApiResponse.fromJson(json);
       if (!apiResponse.hasError) {
         var response = List<Todolist>.from(apiResponse.result.map((x) => Todolist.fromJson(x)));
+        response.add(Todolist(name: 'New List'));
         return ApiResult.success(data: response);
       }
       else

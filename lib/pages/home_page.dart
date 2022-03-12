@@ -6,9 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sinlist_app/core/bloc/result_state.dart';
 import 'package:sinlist_app/core/http/network_exceptions.dart';
 import 'package:sinlist_app/data/lists/todolist.dart';
+import 'package:sinlist_app/data/lists/todolist_items.dart';
 import 'package:sinlist_app/pages/constants.dart';
 import 'package:sinlist_app/pages/lists/list_items.dart';
-import 'package:sinlist_app/theme.dart';
+import 'package:sinlist_app/pages/widgets/toaster.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
@@ -21,6 +22,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   ScrollController controller = new ScrollController();
   Todolist selectedTodolist = new Todolist();
+  List<TodoListItems> todolistItems = <TodoListItems>[];
+
+  Future<void> _getTodolistItems(BuildContext buildContext,int selectedTodolistId) async {
+    var result = await buildContext
+        .read<HomeBloc>()
+        .repository
+        .getTodoListByItems(selectedTodolistId == null ? 0 : selectedTodolistId);
+    result.when(success: (List<TodoListItems> response) {
+      if (response != null) {
+        setState(() {
+          todolistItems = response;
+        });
+      }
+    }, failure: (NetworkExceptions error) {
+      Toaster.error(context: buildContext, error: error);
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -77,7 +95,6 @@ class _HomePageState extends State<HomePage> {
 
   _dataWidget(BuildContext buildContext, List<Todolist> todolist) {
     Size size = MediaQuery.of(context).size;
-    todolist.add(Todolist(name: 'New List'));
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -142,6 +159,7 @@ class _HomePageState extends State<HomePage> {
         onTap: () {
           setState(() {
             selectedTodolist = item;
+            _getTodolistItems(buildContext,selectedTodolist.id);
           });
         },
       ),
@@ -149,7 +167,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   _showListItems(BuildContext buildContext,Todolist todolist) {
-    return ListItems(todolist: todolist,);
+    return ListItems(todolist: todolist,todolistItems: todolistItems);
   }
 
   _addTodolistView(BuildContext buildContext, Todolist item, int index) {

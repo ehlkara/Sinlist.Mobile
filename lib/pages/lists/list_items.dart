@@ -1,53 +1,39 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sinlist_app/bloc/home/home_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sinlist_app/core/bloc/result_state.dart';
 import 'package:sinlist_app/core/http/network_exceptions.dart';
 import 'package:sinlist_app/data/lists/todolist.dart';
 import 'package:sinlist_app/data/lists/todolist_items.dart';
 import 'package:sinlist_app/pages/constants.dart';
+import 'package:sinlist_app/pages/widgets/general_button.dart';
 import 'package:sinlist_app/pages/widgets/toaster.dart';
 
 class ListItems extends StatefulWidget {
-  const ListItems({Key key, this.todolist}) : super(key: key);
+  const ListItems({Key key, this.todolist, this.todolistItems}) : super(key: key);
+  final String routeName = "/list_items";
 
   final Todolist todolist;
+  final List<TodoListItems> todolistItems;
 
   @override
   _ListItemsState createState() => _ListItemsState();
 }
 
 class _ListItemsState extends State<ListItems> {
-  List<TodoListItems> _todolistItems = <TodoListItems>[];
-
-  Future<void> _getTodolistItems(BuildContext buildContext) async {
-    var result = await buildContext
-        .read<HomeBloc>()
-        .repository
-        .getTodoListByItems(widget.todolist.id);
-    result.when(success: (List<TodoListItems> response) {
-      if (response != null) {
-        setState(() {
-          _todolistItems = response;
-        });
-      }
-    }, failure: (NetworkExceptions error) {
-      Toaster.error(context: buildContext, error: error);
-    });
-  }
 
   @override
   void didChangeDependencies() {
-    if (widget.todolist.id != null) {
-      _getTodolistItems(context);
-    }
+
     super.didChangeDependencies();
   }
 
   @override
   void initState() {
+
     super.initState();
   }
 
@@ -67,31 +53,55 @@ class _ListItemsState extends State<ListItems> {
           ),
           color: kSecondaryColor,
         ),
-        child: Column(
-          children: [
-            Text(
-              widget.todolist.name,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
+        child: Container(
+          margin: EdgeInsets.only(bottom: 20,top: 20,right: 20,left: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Text(
+                  widget.todolist.name,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-            SizedBox(
-              height: 2,
-            ),
-            Text(
-              'Items: ',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            _listitemsContainer(context, _todolistItems),
-          ],
+              SizedBox(
+                height: 5,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Text(
+                  'Items: ',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              _listitemsContainer(context, widget.todolistItems),
+              Expanded(
+                child: Align(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: RoundedButton(
+                      color: kPrimaryColor,
+                      text: "Add Item",
+                      key: Key("AddItemButton"),
+                      textColor: Colors.white,
+                      press: null,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -109,13 +119,13 @@ class _ListItemsState extends State<ListItems> {
 
   _itemContainer(BuildContext buildContext, TodoListItems item, int index) {
     return Container(
-      margin: EdgeInsets.only(left: 10, right: 10, bottom: 5),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
-      color: Colors.white,
+      margin: EdgeInsets.only(left: 10, right: 10, bottom: 17),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15),color: Colors.white,),
       child: Row(
         children: [
           Checkbox(value: false, onChanged: null),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 item.name,
@@ -134,31 +144,36 @@ class _ListItemsState extends State<ListItems> {
               )
             ],
           ),
-          Row(
+          Spacer(),
+          Column(
             children: [
-              IconButton(
-                onPressed: null,
-                icon: FaIcon(
-                  FontAwesomeIcons.minusCircle,
-                  color: kPrimaryColor,
-                  size: 26,
-                ),
-              ),
-              Text(
-                item.count.toString(),
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                onPressed: null,
-                icon: FaIcon(
-                  FontAwesomeIcons.plusCircle,
-                  color: kPrimaryColor,
-                  size: 26,
-                ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: null,
+                    icon: FaIcon(
+                      FontAwesomeIcons.minusCircle,
+                      color: kPrimaryColor,
+                      size: 26,
+                    ),
+                  ),
+                  Text(
+                    item.count.toString(),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: null,
+                    icon: FaIcon(
+                      FontAwesomeIcons.plusCircle,
+                      color: kPrimaryColor,
+                      size: 26,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

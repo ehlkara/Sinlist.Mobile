@@ -71,7 +71,7 @@ class Sinlist extends StatelessWidget {
 
     return MaterialApp(
       navigatorKey: Catcher.navigatorKey,
-      title: 'EducationSystems',
+      title: 'Sinlist',
       localizationsDelegates: [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, localizationDelegate],
       supportedLocales: localizationDelegate.supportedLocales,
       locale: localizationDelegate.currentLocale,
