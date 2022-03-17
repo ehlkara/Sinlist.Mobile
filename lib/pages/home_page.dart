@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sinlist_app/bloc/home/home_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,11 +13,13 @@ import 'package:sinlist_app/data/lists/todolist.dart';
 import 'package:sinlist_app/data/lists/todolist_items.dart';
 import 'package:sinlist_app/pages/constants.dart';
 import 'package:sinlist_app/pages/lists/list_items.dart';
+import 'package:sinlist_app/pages/widgets/general_input_field.dart';
 import 'package:sinlist_app/pages/widgets/toaster.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key key}) : super(key: key);
+  const HomePage({Key key,this.todolist}) : super(key: key);
   final String routeName = "/home_page";
+  final Todolist todolist;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -23,6 +29,69 @@ class _HomePageState extends State<HomePage> {
   ScrollController controller = new ScrollController();
   Todolist selectedTodolist = new Todolist();
   List<TodoListItems> todolistItems = <TodoListItems>[];
+  GlobalKey<FormState> todoListCreateFormKey = new GlobalKey<FormState>();
+  Todolist _createList = new Todolist();
+  String deviceName ='';
+  String deviceVersion ='';
+  String identifier= '';
+
+  Future<String>_deviceDetails() async{
+    final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+    try {
+      if (Platform.isAndroid) {
+        var build = await deviceInfoPlugin.androidInfo;
+        setState(() {
+          deviceName = build.model;
+          deviceVersion = build.version.toString();
+          identifier = build.androidId;
+        });
+        return identifier;
+        //UUID for Android
+      } else if (Platform.isIOS) {
+        var data = await deviceInfoPlugin.iosInfo;
+        setState(() {
+          deviceName = data.name;
+          deviceVersion = data.systemVersion;
+          identifier = data.identifierForVendor;
+        });//UUID for iOS
+        return identifier;
+      }
+    } on PlatformException {
+      print('Failed to get platform version');
+    }
+  }
+
+  bool validateAndSave() {
+    final form = todoListCreateFormKey.currentState;
+    if (form.validate()) {
+      form.save();
+      return true;
+    }
+    return false;
+  }
+
+
+  Future<void> _addTodolist(BuildContext buildContext, Todolist _todolist,String _deviceInfo) async
+  {
+    if(validateAndSave()){
+      _todolist.id = 0;
+      _todolist.deviceInfo = _deviceInfo;
+      var result = await buildContext
+          .read<HomeBloc>()
+          .repository
+          .addTodolist(_todolist);
+      result.when(success: (Todolist response) {
+        if (response != null) {
+          setState(() {
+            _todolist = response;
+          });
+        }
+      }, failure: (NetworkExceptions error) {
+        Toaster.error(context: buildContext, error: error);
+      });
+    }
+    FocusScope.of(buildContext).requestFocus(FocusNode());
+  }
 
   Future<void> _getTodolistItems(BuildContext buildContext,int selectedTodolistId) async {
     var result = await buildContext
@@ -42,7 +111,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void didChangeDependencies() {
-    context.read<HomeBloc>().getTodolists("123");
+    _deviceDetails().then((value) {
+      context.read<HomeBloc>().getTodolists(value);
+    });
     super.didChangeDependencies();
   }
 
@@ -174,6 +245,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: EdgeInsets.all(1),
       child: GestureDetector(
+        key: Key("AddList"),
         child: Column(
           children: [
             Container(
@@ -203,6 +275,52 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+        onTap: () => showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('AlertDialog Title'),
+            content: StatefulBuilder(
+              builder:
+                  (BuildContext context, StateSetter _setState) {
+                return _addListPopUpContent(
+                    context, _setState);
+              },
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  var device_info = await _deviceDetails();
+                  _addTodolist(context, _createList,device_info).then((value) {
+                    Navigator.pop(context, 'Ok');
+                  });
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  _addListPopUpContent(BuildContext buildContext, StateSetter _setState) {
+    return SingleChildScrollView(
+      child: new Form(
+        key: todoListCreateFormKey,
+        child: Column(
+          children: [
+            GeneralInputField(
+              key: Key("listName"),
+              hintText: "List Name",
+              validator: (val) =>
+              val.isEmpty ? 'Item name is required' : null,
+              onSaved: (val) => _createList.name = val,
             ),
           ],
         ),

@@ -46,15 +46,18 @@ class _ListItemsState extends State<ListItems> {
           .addTodolistItem(_todoListItem);
       result.when(success: (TodoListItems response) {
         if (response != null) {
-          setState(() {
-            _todoListItem = response;
-          });
+          if(this.mounted)
+            {
+              setState(() {
+                _todoListItem = response;
+              });
+            }
         }
       }, failure: (NetworkExceptions error) {
         Toaster.error(context: buildContext, error: error);
       });
     }
-    FocusScope.of(context).requestFocus(FocusNode());
+    FocusScope.of(buildContext).requestFocus(FocusNode());
   }
 
   @override
@@ -143,7 +146,9 @@ class _ListItemsState extends State<ListItems> {
                             ),
                             TextButton(
                               onPressed: () {
-                                _addTodolistItem(context, _createListItem);
+                                _addTodolistItem(context, _createListItem).then((value) {
+                                  Navigator.pop(context, 'Ok');
+                                });
                               },
                               child: const Text('OK'),
                             ),

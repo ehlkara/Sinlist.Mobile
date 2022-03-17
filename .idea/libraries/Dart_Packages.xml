@@ -135,6 +135,20 @@
             </list>
           </value>
         </entry>
+        <entry key="device_info">
+          <value>
+            <list>
+              <option value="E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-2.0.3/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="device_info_platform_interface">
+          <value>
+            <list>
+              <option value="E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/device_info_platform_interface-2.0.1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="device_info_plus">
           <value>
             <list>
@@ -745,6 +759,8 @@
       <root url="file://E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/crypto-3.0.1/lib" />
       <root url="file://E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/cupertino_icons-1.0.4/lib" />
       <root url="file://E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/dart_style-2.1.1/lib" />
+      <root url="file://E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-2.0.3/lib" />
+      <root url="file://E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/device_info_platform_interface-2.0.1/lib" />
       <root url="file://E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/device_info_plus-3.2.2/lib" />
       <root url="file://E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/device_info_plus_linux-2.1.1/lib" />
       <root url="file://E:/src/flutter/flutter/.pub-cache/hosted/pub.dartlang.org/device_info_plus_macos-2.2.2/lib" />
