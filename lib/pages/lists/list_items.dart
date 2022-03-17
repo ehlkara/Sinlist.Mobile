@@ -173,7 +173,7 @@ class _ListItemsState extends State<ListItems> {
 
   _itemContainer(BuildContext buildContext, TodoListItems item, int index) {
     return Container(
-      margin: EdgeInsets.only(left: 10, right: 10, bottom: 17),
+      margin: EdgeInsets.only(left: 10, right: 5, bottom: 17),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         color: Colors.white,
@@ -207,7 +207,11 @@ class _ListItemsState extends State<ListItems> {
               Row(
                 children: [
                   IconButton(
-                    onPressed: null,
+                    onPressed: () {
+                      setState(() {
+                        item.count == 0 ? item.count=0 : item.count--;
+                      });
+                    },
                     icon: FaIcon(
                       FontAwesomeIcons.minusCircle,
                       color: kPrimaryColor,
@@ -223,7 +227,11 @@ class _ListItemsState extends State<ListItems> {
                     ),
                   ),
                   IconButton(
-                    onPressed: null,
+                    onPressed: () {
+                      setState(() {
+                        item.count++;
+                      });
+                    },
                     icon: FaIcon(
                       FontAwesomeIcons.plusCircle,
                       color: kPrimaryColor,
