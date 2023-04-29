@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:sinlist_app/pages/widgets/custom_style.dart';
 
 class Toaster {
-  static ok({@required BuildContext context, @required String message, SnackBarAction snackBarAction}) {
-    final scaffoldState = Scaffold.of(context);
+  static ok(
+      {@required BuildContext context,
+      @required String message,
+      SnackBarAction snackBarAction}) {
+    final scaffoldState = ScaffoldMessenger.of(context);
     scaffoldState.showSnackBar(SnackBar(
       content: Text(message, style: CustomStyle.text16_ff1b5e20_700()),
       action: snackBarAction,
@@ -14,9 +17,12 @@ class Toaster {
     ));
   }
 
-  static error({@required BuildContext context, @required NetworkExceptions error, SnackBarAction snackBarAction}) {
+  static error(
+      {@required BuildContext context,
+      @required NetworkExceptions error,
+      SnackBarAction snackBarAction}) {
     var message = NetworkExceptions.getErrorMessage(error);
-    final scaffoldState = Scaffold.of(context);
+    final scaffoldState = ScaffoldMessenger.of(context);
     scaffoldState.showSnackBar(SnackBar(
       content: Text(message, style: CustomStyle.text16_ffb40700_700()),
       action: snackBarAction,
@@ -26,8 +32,12 @@ class Toaster {
     ));
   }
 
-  static unSuccesfull({@required BuildContext context, @required String message, SnackBarAction snackBarAction, Duration duration}) {
-    final scaffoldState = Scaffold.of(context);
+  static unSuccesfull(
+      {@required BuildContext context,
+      @required String message,
+      SnackBarAction snackBarAction,
+      Duration duration}) {
+    final scaffoldState = ScaffoldMessenger.of(context);
     scaffoldState.showSnackBar(SnackBar(
       content: Text(message, style: CustomStyle.text16_ffb40700_700()),
       action: snackBarAction,
