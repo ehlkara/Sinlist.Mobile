@@ -17,7 +17,7 @@ import 'package:sinlist_app/pages/widgets/general_input_field.dart';
 import 'package:sinlist_app/pages/widgets/toaster.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key key,this.todolist}) : super(key: key);
+  const HomePage({Key key, this.todolist}) : super(key: key);
   final String routeName = "/home_page";
   final Todolist todolist;
 
@@ -31,11 +31,11 @@ class _HomePageState extends State<HomePage> {
   List<TodoListItems> todolistItems = <TodoListItems>[];
   GlobalKey<FormState> todoListCreateFormKey = new GlobalKey<FormState>();
   Todolist _createList = new Todolist();
-  String deviceName ='';
-  String deviceVersion ='';
-  String identifier= '';
+  String deviceName = '';
+  String deviceVersion = '';
+  String identifier = '';
 
-  Future<String>_deviceDetails() async{
+  Future<String> _deviceDetails() async {
     final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
     try {
       if (Platform.isAndroid) {
@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
           deviceName = data.name;
           deviceVersion = data.systemVersion;
           identifier = data.identifierForVendor;
-        });//UUID for iOS
+        }); //UUID for iOS
         return identifier;
       }
     } on PlatformException {
@@ -70,20 +70,20 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-
-  Future<void> _addTodolist(BuildContext buildContext, Todolist _todolist,String _deviceInfo) async
-  {
-    if(validateAndSave()){
+  Future<void> _addTodolist(
+      BuildContext buildContext, Todolist _todolist, String _deviceInfo) async {
+    if (validateAndSave()) {
       _todolist.id = 0;
       _todolist.deviceInfo = _deviceInfo;
-      var result = await buildContext
-          .read<HomeBloc>()
-          .repository
-          .addTodolist(_todolist);
+      var result =
+          await buildContext.read<HomeBloc>().repository.addTodolist(_todolist);
       result.when(success: (Todolist response) {
         if (response != null) {
           setState(() {
             _todolist = response;
+            _deviceDetails().then((value) {
+              context.read<HomeBloc>().getTodolists(value);
+            });
           });
         }
       }, failure: (NetworkExceptions error) {
@@ -93,11 +93,13 @@ class _HomePageState extends State<HomePage> {
     FocusScope.of(buildContext).requestFocus(FocusNode());
   }
 
-  Future<void> _getTodolistItems(BuildContext buildContext,int selectedTodolistId) async {
+  Future<void> _getTodolistItems(
+      BuildContext buildContext, int selectedTodolistId) async {
     var result = await buildContext
         .read<HomeBloc>()
         .repository
-        .getTodoListByItems(selectedTodolistId == null ? 0 : selectedTodolistId);
+        .getTodoListByItems(
+            selectedTodolistId == null ? 0 : selectedTodolistId);
     result.when(success: (List<TodoListItems> response) {
       if (response != null) {
         setState(() {
@@ -110,8 +112,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void didChangeDependencies() {
-    _deviceDetails().then((value) {
+  void didChangeDependencies() async {
+    await _deviceDetails().then((value) {
       context.read<HomeBloc>().getTodolists(value);
     });
     super.didChangeDependencies();
@@ -209,7 +211,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             height: 25,
           ),
-         _showListItems(buildContext,selectedTodolist),
+          _showListItems(buildContext, selectedTodolist),
         ],
       ),
     );
@@ -230,15 +232,15 @@ class _HomePageState extends State<HomePage> {
         onTap: () {
           setState(() {
             selectedTodolist = item;
-            _getTodolistItems(buildContext,selectedTodolist.id);
+            _getTodolistItems(buildContext, selectedTodolist.id);
           });
         },
       ),
     );
   }
 
-  _showListItems(BuildContext buildContext,Todolist todolist) {
-    return ListItems(todolist: todolist,todolistItems: todolistItems);
+  _showListItems(BuildContext buildContext, Todolist todolist) {
+    return ListItems(todolist: todolist, todolistItems: todolistItems);
   }
 
   _addTodolistView(BuildContext buildContext, Todolist item, int index) {
@@ -283,10 +285,8 @@ class _HomePageState extends State<HomePage> {
           builder: (BuildContext context) => AlertDialog(
             title: const Text('AlertDialog Title'),
             content: StatefulBuilder(
-              builder:
-                  (BuildContext context, StateSetter _setState) {
-                return _addListPopUpContent(
-                    context, _setState);
+              builder: (BuildContext context, StateSetter _setState) {
+                return _addListPopUpContent(context, _setState);
               },
             ),
             actions: <Widget>[
@@ -297,7 +297,7 @@ class _HomePageState extends State<HomePage> {
               TextButton(
                 onPressed: () async {
                   var device_info = await _deviceDetails();
-                  _addTodolist(context, _createList,device_info).then((value) {
+                  _addTodolist(context, _createList, device_info).then((value) {
                     Navigator.pop(context, 'Ok');
                   });
                 },
@@ -309,6 +309,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
   _addListPopUpContent(BuildContext buildContext, StateSetter _setState) {
     return SingleChildScrollView(
       child: new Form(
@@ -318,8 +319,7 @@ class _HomePageState extends State<HomePage> {
             GeneralInputField(
               key: Key("listName"),
               hintText: "List Name",
-              validator: (val) =>
-              val.isEmpty ? 'Item name is required' : null,
+              validator: (val) => val.isEmpty ? 'Item name is required' : null,
               onSaved: (val) => _createList.name = val,
             ),
           ],
